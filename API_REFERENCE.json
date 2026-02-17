@@ -1,0 +1,309 @@
+{
+  "api": {
+    "version": "1.0",
+    "title": "Gestion des Notes API",
+    "description": "API REST pour la gestion sécurisée des notes d'étudiants",
+    "baseUrl": "http://localhost:8000/api",
+    "authentication": "JWT Bearer Token",
+    "endpoints": {
+      "auth": {
+        "login": {
+          "path": "/token/",
+          "method": "POST",
+          "description": "Obtenir un token JWT",
+          "requestBody": {
+            "username": "string",
+            "password": "string"
+          },
+          "response": {
+            "access": "string (token)",
+            "refresh": "string (token)"
+          },
+          "permissions": "Public"
+        },
+        "refreshToken": {
+          "path": "/token/refresh/",
+          "method": "POST",
+          "description": "Rafraîchir le token d'accès",
+          "requestBody": {
+            "refresh": "string"
+          },
+          "response": {
+            "access": "string (new token)"
+          },
+          "permissions": "Authenticated"
+        },
+        "getCurrentUser": {
+          "path": "/users/me/",
+          "method": "GET",
+          "description": "Obtenir l'utilisateur actuel",
+          "permissions": "Authenticated"
+        }
+      },
+      "departments": {
+        "list": {
+          "path": "/departments/",
+          "method": "GET",
+          "description": "Lister tous les départements",
+          "filters": ["search", "ordering"],
+          "pagination": true
+        },
+        "create": {
+          "path": "/departments/",
+          "method": "POST",
+          "description": "Créer un département",
+          "permissions": "Admin or AdjointAdmin",
+          "requestBody": {
+            "name": "string (required, unique)",
+            "code": "string (required, unique)",
+            "description": "string (optional)"
+          }
+        },
+        "retrieve": {
+          "path": "/departments/{id}/",
+          "method": "GET",
+          "description": "Détails d'un département"
+        },
+        "update": {
+          "path": "/departments/{id}/",
+          "method": "PATCH",
+          "description": "Modifier un département",
+          "permissions": "Admin or AdjointAdmin"
+        },
+        "delete": {
+          "path": "/departments/{id}/",
+          "method": "DELETE",
+          "description": "Supprimer un département",
+          "permissions": "Admin"
+        }
+      },
+      "users": {
+        "list": {
+          "path": "/users/",
+          "method": "GET",
+          "description": "Lister tous les utilisateurs",
+          "filters": ["role", "department", "is_active", "search"],
+          "pagination": true
+        },
+        "create": {
+          "path": "/users/",
+          "method": "POST",
+          "description": "Créer un utilisateur",
+          "permissions": "Admin or AdjointAdmin",
+          "requestBody": {
+            "username": "string (required, unique)",
+            "email": "string (required, unique)",
+            "first_name": "string (required)",
+            "last_name": "string (required)",
+            "role": "string (admin|adjoint_admin|point_focal|agent|vice_doyen|student)",
+            "department": "integer (optional, FK)",
+            "password": "string (required)"
+          }
+        },
+        "retrieve": {
+          "path": "/users/{id}/",
+          "method": "GET"
+        },
+        "update": {
+          "path": "/users/{id}/",
+          "method": "PATCH",
+          "permissions": "Admin or AdjointAdmin"
+        },
+        "delete": {
+          "path": "/users/{id}/",
+          "method": "DELETE",
+          "permissions": "Admin"
+        },
+        "deactivateUser": {
+          "path": "/users/deactivate_user/",
+          "method": "POST",
+          "description": "Désactiver un utilisateur",
+          "permissions": "Admin or AdjointAdmin",
+          "requestBody": {
+            "user_id": "integer"
+          }
+        }
+      },
+      "students": {
+        "list": {
+          "path": "/students/",
+          "method": "GET",
+          "description": "Lister tous les étudiants",
+          "filters": ["department", "is_solvable", "search"],
+          "pagination": true
+        },
+        "create": {
+          "path": "/students/",
+          "method": "POST",
+          "description": "Créer un étudiant",
+          "permissions": "Admin or AdjointAdmin",
+          "requestBody": {
+            "matricule": "string (required, unique)",
+            "full_name": "string (required)",
+            "email": "string (required, unique)",
+            "phone": "string (optional)",
+            "department": "integer (required, FK)",
+            "is_solvable": "boolean (default: false)"
+          }
+        },
+        "retrieve": {
+          "path": "/students/{id}/",
+          "method": "GET"
+        },
+        "update": {
+          "path": "/students/{id}/",
+          "method": "PATCH",
+          "permissions": "Admin or AdjointAdmin"
+        },
+        "delete": {
+          "path": "/students/{id}/",
+          "method": "DELETE",
+          "permissions": "Admin"
+        },
+        "setSolvability": {
+          "path": "/students/set_solvability/",
+          "method": "POST",
+          "description": "Modifier la solvabilité d'un étudiant",
+          "permissions": "Admin or AdjointAdmin",
+          "requestBody": {
+            "student_id": "integer",
+            "is_solvable": "boolean"
+          }
+        }
+      },
+      "notes": {
+        "list": {
+          "path": "/notes/",
+          "method": "GET",
+          "description": "Lister les notes (filtrées par rôle)",
+          "filters": ["student", "period", "status", "point_focal", "search"],
+          "pagination": true,
+          "note": "Les étudiants ne voient que leurs notes validées et s'ils sont solvables"
+        },
+        "create": {
+          "path": "/notes/",
+          "method": "POST",
+          "description": "Créer une note (import)",
+          "permissions": "PointFocal or Admin",
+          "requestBody": {
+            "student": "integer (required, FK)",
+            "subject": "string (required)",
+            "value": "decimal (0-20, required)",
+            "period": "string (required)"
+          }
+        },
+        "retrieve": {
+          "path": "/notes/{id}/",
+          "method": "GET"
+        },
+        "update": {
+          "path": "/notes/{id}/",
+          "method": "PATCH",
+          "permissions": "PointFocal or Admin"
+        },
+        "delete": {
+          "path": "/notes/{id}/",
+          "method": "DELETE",
+          "permissions": "Admin"
+        },
+        "validateNote": {
+          "path": "/notes/{id}/validate_note/",
+          "method": "POST",
+          "description": "Valider une note (génère automatiquement PV)",
+          "permissions": "Admin or ViceDoyen or Agent",
+          "effect": "Note.status = 'validated', PV auto-créé"
+        },
+        "rejectNote": {
+          "path": "/notes/{id}/reject_note/",
+          "method": "POST",
+          "description": "Rejeter une note",
+          "permissions": "Admin or ViceDoyen or Agent",
+          "requestBody": {
+            "reason": "string (optional)"
+          }
+        },
+        "pendingNotes": {
+          "path": "/notes/pending_notes/",
+          "method": "GET",
+          "description": "Récupérer les notes en attente",
+          "permissions": "PointFocal or Admin"
+        }
+      },
+      "pvs": {
+        "list": {
+          "path": "/pvs/",
+          "method": "GET",
+          "description": "Lister tous les PVs",
+          "filters": ["payment_status"],
+          "pagination": true
+        },
+        "retrieve": {
+          "path": "/pvs/{id}/",
+          "method": "GET"
+        },
+        "visaPV": {
+          "path": "/pvs/{id}/visa_pv/",
+          "method": "POST",
+          "description": "Viser un PV",
+          "permissions": "ViceDoyen or Admin",
+          "effect": "PV.visa_by = user, PV.visa_date = now()"
+        },
+        "printPV": {
+          "path": "/pvs/{id}/print_pv/",
+          "method": "POST",
+          "description": "Marquer un PV comme imprimé",
+          "permissions": "Agent or Admin",
+          "effect": "PV.printed_by = user, PV.printed_date = now()"
+        },
+        "setPaymentStatus": {
+          "path": "/pvs/{id}/set_payment_status/",
+          "method": "POST",
+          "description": "Définir le statut de paiement",
+          "permissions": "Admin",
+          "requestBody": {
+            "status": "string (paid|unpaid|partial)"
+          }
+        }
+      },
+      "auditLogs": {
+        "list": {
+          "path": "/audit-logs/",
+          "method": "GET",
+          "description": "Lister les logs d'audit",
+          "permissions": "Admin or AdjointAdmin",
+          "filters": ["action_type", "model_name", "user"],
+          "pagination": true
+        },
+        "retrieve": {
+          "path": "/audit-logs/{id}/",
+          "method": "GET",
+          "permissions": "Admin or AdjointAdmin"
+        },
+        "note": "Read-only, les logs ne peuvent pas être modifiés ou supprimés"
+      }
+    },
+    "errorHandling": {
+      "401": {
+        "message": "Unauthorized - Token missing or invalid",
+        "action": "Login or refresh token"
+      },
+      "403": {
+        "message": "Forbidden - Insufficient permissions",
+        "action": "Check user role"
+      },
+      "404": {
+        "message": "Not found - Resource doesn't exist",
+        "action": "Verify the resource ID"
+      },
+      "400": {
+        "message": "Bad request - Invalid data",
+        "action": "Check request body"
+      }
+    },
+    "rateLimit": "Will be implemented with Nginx",
+    "pagination": {
+      "pageSize": 50,
+      "parameter": "page"
+    }
+  }
+}

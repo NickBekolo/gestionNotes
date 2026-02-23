@@ -1,10 +1,10 @@
 # Système de Gestion des Notes - Documentation Complète
 
-## 🎯 Objectif du Projet
+##  Objectif du Projet
 
 Créer un système sécurisé pour la collecte, validation et publication des notes des étudiants avec traçabilité complète et contrôle hiérarchique.
 
-## 📋 Table des matières
+##  Table des matières
 
 - [Structure du Projet](#structure-du-projet)
 - [Installation](#installation)
@@ -14,7 +14,7 @@ Créer un système sécurisé pour la collecte, validation et publication des no
 - [Sécurité](#sécurité)
 - [Déploiement](#déploiement)
 
-## 📁 Structure du Projet
+##  Structure du Projet
 
 ```
 gestion-notes/
@@ -42,7 +42,7 @@ gestion-notes/
 └── docker-compose.yml       # Orchestration des services
 ```
 
-## 🚀 Installation
+##  Installation
 
 ### Prérequis
 
@@ -96,7 +96,7 @@ cp .env.example .env
 npm start
 ```
 
-## ⚙️ Configuration
+##  Configuration
 
 ### Backend - Fichier .env
 
@@ -121,7 +121,7 @@ DB_PORT=5432
 REACT_APP_API_URL=http://localhost:8000/api
 ```
 
-## 👥 Rôles et Permissions
+##  Rôles et Permissions
 
 | Rôle | Accès | Actions |
 |------|-------|---------|
@@ -132,7 +132,7 @@ REACT_APP_API_URL=http://localhost:8000/api
 | **Vice-Doyen** | Modéré | Visa PV, validation hiérarchique |
 | **Étudiant** | Consultation | Voir ses notes (si solvable) |
 
-## 🔑 Utilisateurs de Test
+##  Utilisateurs de Test
 
 ```
 Admin
@@ -152,7 +152,7 @@ Vice-Doyen
 - Password: vd123
 ```
 
-## 📊 Modèles de Données
+##  Modèles de Données
 
 ### User (Utilisateur)
 - Héritage de AbstractUser
@@ -183,7 +183,7 @@ Vice-Doyen
 - details_before, details_after
 - ip_address, user_agent, created_at
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 ### Authentication
 ```
@@ -238,7 +238,7 @@ GET    /api/audit-logs/       - Lister (Admin)
 GET    /api/audit-logs/{id}/  - Détails
 ```
 
-## 🔒 Sécurité
+##  Sécurité
 
 ### Implémentations
 - **JWT Authentication** - Tokens sécurisés
@@ -256,7 +256,7 @@ GET    /api/audit-logs/{id}/  - Détails
 - Sessions courtes (1h pour access token)
 - Logs immuables pour audit
 
-## 📦 Déploiement
+##  Déploiement
 
 ### Avec Docker Compose
 
@@ -319,7 +319,7 @@ docker build -t gestion-notes-frontend ./frontend
    └─ Notes validées visibles
 ```
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Erreur de migration
 ```bash

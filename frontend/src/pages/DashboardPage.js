@@ -39,12 +39,12 @@ export const DashboardPage = () => {
             {user?.role === 'point_focal' && (
               <>
                 <MenuCard
-                  title="📝 Saisir une note"
+                  title=" Saisir une note"
                   description="Ajouter une nouvelle note pour votre département"
                   onClick={() => navigate('/point-focal?saisie=1')}
                 />
                 <MenuCard
-                  title="📋 Voir mes notes"
+                  title=" Voir mes notes"
                   description="Consulter toutes les notes de votre département"
                   onClick={() => navigate('/point-focal?notes=1')}
                 />
@@ -89,7 +89,7 @@ export const DashboardPage = () => {
             {user?.role === 'vice_doyen' && (
               <>
                 <MenuCard
-                  title="📄 Procès-verbaux"
+                  title=" Procès-verbaux"
                   description="Valider les procès-verbaux"
                   onClick={() => navigate('/pvs')}
                 />

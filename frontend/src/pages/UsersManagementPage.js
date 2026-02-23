@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { userService } from '../services/api';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -14,6 +15,7 @@ const userValidationSchema = Yup.object({
 });
 
 export const UsersManagementPage = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -66,12 +68,20 @@ export const UsersManagementPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">👥 Gestion des Utilisateurs</h1>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
-            >
-              {showForm ? 'Annuler' : '+ Nouvel utilisateur'}
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate(-1)}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition"
+              >
+                ← Retour
+              </button>
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+              >
+                {showForm ? 'Annuler' : '+ Nouvel utilisateur'}
+              </button>
+            </div>
           </div>
 
           {error && (

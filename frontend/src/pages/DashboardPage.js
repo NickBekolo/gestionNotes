@@ -27,7 +27,7 @@ export const DashboardPage = () => {
           {/* Bienvenue */}
           <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              Bienvenue, {user?.first_name}! 👋
+              Bienvenue, {user?.first_name}! 
             </h1>
             <p className="text-gray-600 text-lg mb-4">
               {getRoleDescription(user?.role)}
@@ -39,20 +39,35 @@ export const DashboardPage = () => {
             {user?.role === 'point_focal' && (
               <>
                 <MenuCard
-                  title="📝 Importer des Notes"
-                  description="Ajouter de nouvelles notes pour votre département"
-                  onClick={() => navigate('/notes/import')}
+                  title="📝 Saisir une note"
+                  description="Ajouter une nouvelle note pour votre département"
+                  onClick={() => navigate('/point-focal?saisie=1')}
                 />
                 <MenuCard
-                  title="📊 Notes en attente"
-                  description="Voir les notes en cours de validation"
-                  onClick={() => navigate('/notes/pending')}
+                  title="📋 Voir mes notes"
+                  description="Consulter toutes les notes de votre département"
+                  onClick={() => navigate('/point-focal?notes=1')}
+                />
+                <MenuCard
+                  title="✅ Demander validation"
+                  description="Demander la validation des notes en brouillon"
+                  onClick={() => navigate('/point-focal?validation=1')}
+                />
+                <MenuCard
+                  title="🕒 Historique de mes actions"
+                  description="Voir l'historique de vos actions sur les notes"
+                  onClick={() => navigate('/point-focal?historique=1')}
                 />
               </>
             )}
 
             {(['admin', 'adjoint_admin'].includes(user?.role)) && (
               <>
+                <MenuCard
+                  title="🖥️ Tableau de Bord Admin"
+                  description="Gestion système, délégations, supervision"
+                  onClick={() => navigate('/admin-dashboard')}
+                />
                 <MenuCard
                   title="👥 Gestion utilisateurs"
                   description="Créer et gérer les utilisateurs du système"
@@ -64,7 +79,7 @@ export const DashboardPage = () => {
                   onClick={() => navigate('/audit-logs')}
                 />
                 <MenuCard
-                  title="📚 Gestion étudiants"
+                  title="👨‍🎓 Gestion étudiants"
                   description="Consulter et modifier la liste des étudiants"
                   onClick={() => navigate('/students')}
                 />
@@ -74,12 +89,12 @@ export const DashboardPage = () => {
             {user?.role === 'vice_doyen' && (
               <>
                 <MenuCard
-                  title="✅ Visa des PV"
+                  title="📄 Procès-verbaux"
                   description="Valider les procès-verbaux"
                   onClick={() => navigate('/pvs')}
                 />
                 <MenuCard
-                  title="📝 Validation notes"
+                  title="✅ Validation notes"
                   description="Valider ou rejeter les notes"
                   onClick={() => navigate('/notes')}
                 />
@@ -89,12 +104,12 @@ export const DashboardPage = () => {
             {user?.role === 'agent' && (
               <>
                 <MenuCard
-                  title="🖨️ Imprimer PV"
-                  description="Imprimer les procès-verbaux"
+                  title="🖨️ Procès-verbaux"
+                  description="Imprimer et consulter les PV"
                   onClick={() => navigate('/pvs')}
                 />
                 <MenuCard
-                  title="📝 Consulter notes"
+                  title="📊 Consulter notes"
                   description="Consulter les notes validées"
                   onClick={() => navigate('/notes')}
                 />
@@ -103,14 +118,14 @@ export const DashboardPage = () => {
 
             {user?.role === 'student' && (
               <MenuCard
-                title="📊 Mes notes"
+                title="📚 Mes notes"
                 description="Consulter vos notes"
                 onClick={() => navigate('/notes')}
               />
             )}
 
             <MenuCard
-              title="⚙️ Profil"
+              title="👤 Profil"
               description="Gérer votre profil utilisateur"
               onClick={() => navigate('/profile')}
             />

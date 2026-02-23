@@ -6,9 +6,23 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import NotesListPage from './pages/NotesListPage';
 import UsersManagementPage from './pages/UsersManagementPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import AuditLogsPage from './pages/AuditLogsPage';
 import StudentsListPage from './pages/StudentsListPage';
+import ProfilePage from './pages/ProfilePage';
+import PVPage from './pages/PVPage';
+import PointFocalPage from './pages/PointFocalPage';
 import './App.css';
+// ...existing code...
+          <Route
+            path="/point-focal"
+            element={
+              <ProtectedRoute requiredRoles={["point_focal"]}>
+                <PointFocalPage />
+              </ProtectedRoute>
+            }
+          />
+
 
 function App() {
   return (
@@ -60,6 +74,33 @@ function App() {
             element={
               <ProtectedRoute requiredRoles={['admin', 'adjoint_admin']}>
                 <StudentsListPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pvs"
+            element={
+              <ProtectedRoute requiredRoles={['agent', 'vice_doyen']}>
+                <PVPage />
               </ProtectedRoute>
             }
           />

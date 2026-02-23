@@ -28,14 +28,20 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('access_token', access);
       
       // Récupérer les informations de l'utilisateur
-      const userResponse = await authService.getCurrentUser();
-      const userData = userResponse.data;
+      try {
+        const userResponse = await authService.getCurrentUser();
+        const userData = userResponse.data;
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+      } catch (userError) {
+        // Si l'appel échoue, stocker juste le username
+        const userData = { username };
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+      }
       
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
       setIsAuthenticated(true);
-      
-      return userData;
+      return { username };
     } catch (error) {
       throw error;
     }

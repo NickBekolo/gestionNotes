@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
-# Choices
+
 ROLE_CHOICES = [
     ('admin', 'Administrateur'),
     ('adjoint_admin', 'Adjoint Admin'),
@@ -33,6 +33,8 @@ ACTION_TYPE_CHOICES = [
     ('import', 'Import'),
     ('export', 'Export'),
     ('login', 'Connexion'),
+    ('delegation', 'Délégation'),
+    ('final_validation', 'Validation Finale'),
 ]
 
 
@@ -58,6 +60,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    delegation_info = models.JSONField(null=True, blank=True, help_text="Info de délégation temporaire")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -120,14 +123,19 @@ class Note(models.Model):
     subject = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=5, decimal_places=2)
     period = models.CharField(max_length=50)  # "Semestre 1", "CC1", etc.
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES + [('final_validated', 'Validée finalement')], default='pending')
     
-    # Validation
+
     validated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
                                     limit_choices_to={'role__in': ['admin', 'vice_doyen', 'agent']},
                                     related_name='validated_notes')
     validation_date = models.DateTimeField(null=True, blank=True)
     rejection_reason = models.TextField(blank=True)
+    
+    final_validated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                          limit_choices_to={'role': 'admin'},
+                                          related_name='final_validated_notes')
+    final_validation_date = models.DateTimeField(null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -148,7 +156,7 @@ class Note(models.Model):
 
     def can_display(self):
         """Retourne True si la note peut être affichée (étudiant solvable + note validée)"""
-        return self.student.is_solvable and self.status == 'validated'
+        return self.student.is_solvable and self.status in ['validated', 'final_validated']
 
 
 class PV(models.Model):
@@ -190,11 +198,11 @@ class AuditLog(models.Model):
     object_id = models.CharField(max_length=50)
     object_repr = models.CharField(max_length=255, blank=True)
     
-    # Avant et après
+
     details_before = models.JSONField(null=True, blank=True)
     details_after = models.JSONField(null=True, blank=True)
     
-    # IP et informations de session
+
     ip_address = models.CharField(max_length=45, blank=True)
     user_agent = models.TextField(blank=True)
     

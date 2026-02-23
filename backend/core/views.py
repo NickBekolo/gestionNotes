@@ -115,6 +115,101 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'status': 'User deactivated'})
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    @action(detail=False, methods=['post'], permission_classes=[IsAdmin()])
+    def activate_user(self, request):
+        """Active un utilisateur (Admin seulement)"""
+        user_id = request.data.get('user_id')
+        try:
+            user = User.objects.get(id=user_id)
+            user.is_active = True
+            user.save()
+            
+            log_audit(
+                user=request.user,
+                action_type='update',
+                model_name='User',
+                object_id=user.id,
+                object_repr=str(user),
+                details_after={'is_active': True},
+                request=request
+            )
+            return Response({'status': 'User activated'})
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    @action(detail=False, methods=['post'], permission_classes=[IsAdmin()])
+    def delegate_privileges(self, request):
+        """Délègue temporairement les privilèges à un adjoint (traçabilité obligatoire)"""
+        adjoint_id = request.data.get('adjoint_id')
+        reason = request.data.get('reason', '')
+        duration_days = request.data.get('duration_days', 7)
+        
+        try:
+            adjoint = User.objects.get(id=adjoint_id)
+            if adjoint.role != 'adjoint_admin':
+                return Response(
+                    {'error': 'Seul un adjoint_admin peut recevoir une délégation'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Stocker la délégation dans les métadonnées
+            delegation_info = {
+                'delegated_by': request.user.id,
+                'delegated_by_username': request.user.username,
+                'delegated_at': timezone.now().isoformat(),
+                'reason': reason,
+                'duration_days': duration_days,
+            }
+            
+            adjoint.delegation_info = delegation_info
+            adjoint.save()
+            
+            log_audit(
+                user=request.user,
+                action_type='delegation',
+                model_name='User',
+                object_id=adjoint.id,
+                object_repr=f'Delegation to {adjoint.username}',
+                details_after=delegation_info,
+                request=request
+            )
+            return Response({'status': 'Privileges delegated', 'delegation_info': delegation_info})
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAdmin()])
+    def revoke_delegation(self, request):
+        """Retire une délégation temporaire avant l'expiration"""
+        adjoint_id = request.data.get('adjoint_id')
+        
+        try:
+            adjoint = User.objects.get(id=adjoint_id)
+            if not adjoint.delegation_info:
+                return Response(
+                    {'error': 'Cet utilisateur n\'a pas de délégation active'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Récupérer les infos avant la suppression pour l'audit
+            delegation_info_before = adjoint.delegation_info.copy()
+            
+            # Retirer la délégation
+            adjoint.delegation_info = None
+            adjoint.save()
+            
+            log_audit(
+                user=request.user,
+                action_type='revoke_delegation',
+                model_name='User',
+                object_id=adjoint.id,
+                object_repr=f'Revoked delegation from {adjoint.username}',
+                details_before=delegation_info_before,
+                request=request
+            )
+            return Response({'status': 'Delegation revoked'})
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -257,6 +352,37 @@ class NoteViewSet(viewsets.ModelViewSet):
         log_audit(
             user=request.user,
             action_type='reject',
+            model_name='Note',
+            object_id=note.id,
+            object_repr=str(note),
+            details_before=before,
+            details_after=serialize_model_instance(note),
+            request=request
+        )
+        
+        serializer = NoteSerializer(note)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAdmin()])
+    def final_validation(self, request, pk=None):
+        """Validation finale de la note par l'administrateur"""
+        note = self.get_object()
+        before = serialize_model_instance(note)
+        
+        if note.status != 'validated':
+            return Response(
+                {'error': 'La note doit être validée avant la validation finale'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        note.status = 'final_validated'
+        note.final_validated_by = request.user
+        note.final_validation_date = timezone.now()
+        note.save()
+        
+        log_audit(
+            user=request.user,
+            action_type='final_validation',
             model_name='Note',
             object_id=note.id,
             object_repr=str(note),

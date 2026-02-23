@@ -60,7 +60,12 @@ export const userService = {
   create: (data) => apiClient.post('/users/', data),
   update: (id, data) => apiClient.patch(`/users/${id}/`, data),
   delete: (id) => apiClient.delete(`/users/${id}/`),
+  activateUser: (userId) => apiClient.post('/users/activate_user/', { user_id: userId }),
   deactivateUser: (userId) => apiClient.post('/users/deactivate_user/', { user_id: userId }),
+  delegatePrivileges: (adjointId, reason, durationDays) => 
+    apiClient.post('/users/delegate_privileges/', { adjoint_id: adjointId, reason, duration_days: durationDays }),
+  revokeDelegation: (adjointId) => 
+    apiClient.post('/users/revoke_delegation/', { adjoint_id: adjointId }),
 };
 
 export const studentService = {

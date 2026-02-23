@@ -49,12 +49,12 @@ export const DashboardPage = () => {
                   onClick={() => navigate('/point-focal?notes=1')}
                 />
                 <MenuCard
-                  title="✅ Demander validation"
+                  title=" Demander validation"
                   description="Demander la validation des notes en brouillon"
                   onClick={() => navigate('/point-focal?validation=1')}
                 />
                 <MenuCard
-                  title="🕒 Historique de mes actions"
+                  title=" Historique de mes actions"
                   description="Voir l'historique de vos actions sur les notes"
                   onClick={() => navigate('/point-focal?historique=1')}
                 />
@@ -64,22 +64,22 @@ export const DashboardPage = () => {
             {(['admin', 'adjoint_admin'].includes(user?.role)) && (
               <>
                 <MenuCard
-                  title="🖥️ Tableau de Bord Admin"
+                  title=" Tableau de Bord Admin"
                   description="Gestion système, délégations, supervision"
                   onClick={() => navigate('/admin-dashboard')}
                 />
                 <MenuCard
-                  title="👥 Gestion utilisateurs"
+                  title=" Gestion utilisateurs"
                   description="Créer et gérer les utilisateurs du système"
                   onClick={() => navigate('/users')}
                 />
                 <MenuCard
-                  title="📋 Audit logs"
+                  title=" Audit logs"
                   description="Consulter l'historique complet des actions"
                   onClick={() => navigate('/audit-logs')}
                 />
                 <MenuCard
-                  title="👨‍🎓 Gestion étudiants"
+                  title=" Gestion étudiants"
                   description="Consulter et modifier la liste des étudiants"
                   onClick={() => navigate('/students')}
                 />
@@ -94,7 +94,7 @@ export const DashboardPage = () => {
                   onClick={() => navigate('/pvs')}
                 />
                 <MenuCard
-                  title="✅ Validation notes"
+                  title=" Validation notes"
                   description="Valider ou rejeter les notes"
                   onClick={() => navigate('/notes')}
                 />
@@ -104,12 +104,12 @@ export const DashboardPage = () => {
             {user?.role === 'agent' && (
               <>
                 <MenuCard
-                  title="🖨️ Procès-verbaux"
+                  title=" Procès-verbaux"
                   description="Imprimer et consulter les PV"
                   onClick={() => navigate('/pvs')}
                 />
                 <MenuCard
-                  title="📊 Consulter notes"
+                  title=" Consulter notes"
                   description="Consulter les notes validées"
                   onClick={() => navigate('/notes')}
                 />
@@ -118,14 +118,14 @@ export const DashboardPage = () => {
 
             {user?.role === 'student' && (
               <MenuCard
-                title="📚 Mes notes"
+                title=" Mes notes"
                 description="Consulter vos notes"
                 onClick={() => navigate('/notes')}
               />
             )}
 
             <MenuCard
-              title="👤 Profil"
+              title=" Profil"
               description="Gérer votre profil utilisateur"
               onClick={() => navigate('/profile')}
             />
